@@ -1,0 +1,14 @@
+binance-connector
+pandas
+ta
+numpy
+scipy
+colorama
+datetime
+tabulate
+requests
+dotenv
+pandas_ta
+click
+telegram-send
+
