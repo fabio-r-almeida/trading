@@ -210,16 +210,22 @@ def output(df, TRADING, interval,going_up):
     print(tabulate([["Pair", "Price", "Time Frame" ],[ pair_moedas ,Symbol + str(df.Close.iloc[-1]) + " " + str(symbol) + Style.RESET_ALL, str(interval)]], headers="firstrow", tablefmt="fancy_grid"))  
     print(tabulate([\
     ["Type", "Time","EMA200","RSI_K","RSI_D","RSI_Diff","STrend.10.1","STrend.11.2","STrend.12.3" ],\
-    [Fore.CYAN +  "Short" + Style.RESET_ALL, \
-    str(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),\
-    A +  str(df['EMA200'].iloc[-1]) + Style.RESET_ALL, \
-    B +  str(df['RSI_Good'].iloc[-1]) + Style.RESET_ALL, \
-    C +  str(df['RSI_Bad'].iloc[-1]) + Style.RESET_ALL, \
-    D +  str(df['RSI_Diff'].iloc[-1]) + Style.RESET_ALL, \
-    E +  str(df['ST_10_1'].iloc[-1]) + Style.RESET_ALL, \
-    F +  str(df['ST_11_2'].iloc[-1]) + Style.RESET_ALL, \
-    G +  str(df['ST_12_3'].iloc[-1]) + Style.RESET_ALL, \
-    ],[Fore.CYAN +  "Long" + Style.RESET_ALL, \
+    ##- Short apenas disponivel nos USA!
+    #    
+    #[Fore.CYAN +  "Short" + Style.RESET_ALL, \
+    #str(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),\
+    #A +  str(df['EMA200'].iloc[-1]) + Style.RESET_ALL, \
+    #B +  str(df['RSI_Good'].iloc[-1]) + Style.RESET_ALL, \
+    #C +  str(df['RSI_Bad'].iloc[-1]) + Style.RESET_ALL, \
+    #D +  str(df['RSI_Diff'].iloc[-1]) + Style.RESET_ALL, \
+    #E +  str(df['ST_10_1'].iloc[-1]) + Style.RESET_ALL, \
+    #F +  str(df['ST_11_2'].iloc[-1]) + Style.RESET_ALL, \
+    #G +  str(df['ST_12_3'].iloc[-1]) + Style.RESET_ALL, \
+    #],
+    #
+    
+    
+    [Fore.CYAN +  "SPOT - Long" + Style.RESET_ALL, \
     str(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),\
     AA +  str(df['EMA200'].iloc[-1]) + Style.RESET_ALL, \
     BB +  str(df['RSI_Good'].iloc[-1]) + Style.RESET_ALL, \
@@ -307,41 +313,50 @@ def run():
         
         if not TRADING:
         #SHORT
-            if df['EMA200'].iloc[-1] > df.Close.iloc[-1]:
-                if (df['RSI_Good'].iloc[-1] > 80) and (df['RSI_Bad'].iloc[-1] > 80):
-                    if df['RSI_Diff'].iloc[-1] < 0:
-                        if ((df['ST_10_1'].iloc[-1] > df.Close.iloc[-1]) and (df['ST_11_2'].iloc[-1] > df.Close.iloc[-1])) \
-                        or ((df['ST_10_1'].iloc[-1] > df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] > df.Close.iloc[-1])) \
-                        or ((df['ST_11_2'].iloc[-1] > df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] > df.Close.iloc[-1])):
-                                super_trend = []
-                                super_trend.append(df['ST_10_1'].iloc[-1])
-                                super_trend.append(df['ST_11_2'].iloc[-1])
-                                super_trend.append(df['ST_12_3'].iloc[-1])
-                                super_trend.sort()
-                                STOP_LOSS = super_trend[1]
-                                Stop_Loss_min = df.Close.iloc[-1]*0.65/100+df.Close.iloc[-1]
-                                if  STOP_LOSS > Stop_Loss_min:
-                                    pass
-                                else:
-                                    STOP_LOSS = Stop_Loss_min
-                                    
-                                TARGET = (df.Close.iloc[-1]-STOP_LOSS)/0.75 + df.Close.iloc[-1]
-                                TYPE = True
-                                ORDER_TIME = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                                sound() # Beep
-                                try:                                
-                                   telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
-                                   ["#### SHORT ####"],\
-                                   ["Target: " + str(TARGET)],\
-                                   ["Stop-Loss: "+ str(STOP_LOSS)]])
-                                except:
-                                   pass                               
-                                with open('BuySell.txt', 'a') as out: 
-                                    pprint("Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), stream=out)
-                                    pprint("#### SHORT ####", stream=out)
-                                    pprint("Target: " + str(TARGET), stream=out)
-                                    pprint("Stop-Loss: "+ str(STOP_LOSS), stream=out)
-                                TRADING = True
+        #
+        #    Short trading apenas funciona para futures que:
+        #     -   Nao estao disponiveis em Euros
+        #     -   Nao estao disponiveis para criacao de contas na europa
+        #     -   Precisa-se de por dinheiro
+        #     -   Pode-se no final ficar a dever ao binance
+        #    
+        #
+        #    if df['EMA200'].iloc[-1] > df.Close.iloc[-1]:
+        #        if (df['RSI_Good'].iloc[-1] > 80) and (df['RSI_Bad'].iloc[-1] > 80):
+        #            if df['RSI_Diff'].iloc[-1] < 0:
+        #                if ((df['ST_10_1'].iloc[-1] > df.Close.iloc[-1]) and (df['ST_11_2'].iloc[-1] > df.Close.iloc[-1])) \
+        #                or ((df['ST_10_1'].iloc[-1] > df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] > df.Close.iloc[-1])) \
+        #                or ((df['ST_11_2'].iloc[-1] > df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] > df.Close.iloc[-1])):
+        #                        super_trend = []
+        #                        super_trend.append(df['ST_10_1'].iloc[-1])
+        #                        super_trend.append(df['ST_11_2'].iloc[-1])
+        #                        super_trend.append(df['ST_12_3'].iloc[-1])
+        #                        super_trend.sort()
+        #                        STOP_LOSS = super_trend[1]
+        #                        Stop_Loss_min = df.Close.iloc[-1]*0.65/100+df.Close.iloc[-1]
+        #                        if  STOP_LOSS > Stop_Loss_min:
+        #                            pass
+        #                        else:
+        #                            STOP_LOSS = Stop_Loss_min
+        #                            
+        #                        TARGET = (df.Close.iloc[-1]-STOP_LOSS)/0.75 + df.Close.iloc[-1]
+        #                        TYPE = True
+        #                        ORDER_TIME = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        #                        sound() # Beep
+        #                        try:                                
+        #                           telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
+        #                           ["#### SHORT ####"],\
+        #                           ["Target: " + str(TARGET)],\
+        #                           ["Stop-Loss: "+ str(STOP_LOSS)]])
+        #                        except:
+        #                           pass                               
+        #                        with open('BuySell.txt', 'a') as out: 
+        #                            pprint("Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), stream=out)
+        #                            pprint("#### SHORT ####", stream=out)
+        #                            pprint("Target: " + str(TARGET), stream=out)
+        #                            pprint("Stop-Loss: "+ str(STOP_LOSS), stream=out)
+        #                        TRADING = True
+        #                       
         #LONG
             if df['EMA200'].iloc[-1] < df.Close.iloc[-1]:
                 if (df['RSI_Good'].iloc[-1] < 20) and (df['RSI_Bad'].iloc[-1] < 20):
@@ -501,7 +516,8 @@ def return_status():
 
     df = getminutedata(pair_moedas, time_interval)
     applytechnicals(df)    
-    return  tabulate([["Current Price ->",str(df.Close.iloc[-1])+"€"],\
+    return  tabulate([      ["Currently Trading->",str(pair_moedas)],\
+                            ["Current Price ->",str(df.Close.iloc[-1])+"€"],\
                             ["Time interval ->",str(time_interval)], \
                             ["EMA 200 ->",str(df['EMA200'].iloc[-1])], \
                             ["Stoch RSI K ->",str(df['RSI_Good'].iloc[-1])], \
