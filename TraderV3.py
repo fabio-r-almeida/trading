@@ -42,6 +42,7 @@ OLD_PRICE = 0
 
 #Telegram bot variables
 Orders_dataframe = pd.DataFrame([], columns = ['Type of Order', 'Time','Stop-Loss','Target','Status'])
+Orders_Status = pd.DataFrame([], columns = ['Pair', 'Time','Stop-Loss','Target','Status'])
 
 
 sold = True
@@ -114,6 +115,8 @@ def applytechnicals(df):
     df['ST_12_3'] = pandas_ta.supertrend(df.High, df.Low, df.Close, 12, 3)['SUPERT_12_3.0']
     df['EMA200'] = ta.trend.ema_indicator(df.Close, 200)
     
+    
+
     #https://stackoverflow.com/questions/44935269/supertrend-code-using-pandas-python
     
     df.dropna(inplace=True)
@@ -493,6 +496,27 @@ def return_orders():
     
 def orders(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=return_orders())
+
+def return_status():  
+
+    df = getminutedata(pair_moedas, time_interval)
+    applytechnicals(df)    
+    return  tabulate([["Current Price ->",str(df.Close.iloc[-1])+"€"],\
+                            ["Time interval ->",str(time_interval)], \
+                            ["EMA 200 ->",str(df['EMA200'].iloc[-1])], \
+                            ["Stoch RSI K ->",str(df['RSI_Good'].iloc[-1])], \
+                            ["Stoch RSI D ->",str(df['RSI_Bad'].iloc[-1])], \
+                            ["RSI Difference ->",str(df['RSI_Diff'].iloc[-1])], \
+                            ["SuperTrend 10-1 ->",str(df['ST_10_1'].iloc[-1])], \
+                            ["SuperTrend 11-2 ->",str(df['ST_11_2'].iloc[-1])], \
+                            ["SuperTrend 12-3 ->",str(df['ST_12_3'].iloc[-1])], \
+                            ],tablefmt='plain')
+
+    
+            
+    
+def status(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text=return_status())
   
 if __name__ == '__main__':
     pair_moedas = input("Enter your pair: ")    
@@ -504,7 +528,10 @@ if __name__ == '__main__':
     
     orders_handler = CommandHandler("orders", orders)
     dispatcher.add_handler(orders_handler)
+    
+    status_handler = CommandHandler("status", status)
+    dispatcher.add_handler(status_handler)
 
     updater.start_polling()
-
+    
     run()

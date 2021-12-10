@@ -7,7 +7,7 @@ colorama
 datetime
 tabulate
 requests
-dotenv
+python-dotenv
 pandas_ta
 click
 telegram-send
