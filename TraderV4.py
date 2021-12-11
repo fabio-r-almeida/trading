@@ -29,13 +29,15 @@ from telegram.ext import Updater, CommandHandler
 client = Spot()
 print(client.time())
 
+def str2bool(v):
+  return v.lower() in ("true", "True", "TRUE", "1")
 
 text_file = open("currency.txt", "r")
 lines = text_file.readlines()
 
-BALANCE_MONEY = int(lines[0])
-BALANCE_COIN  = int(lines[1])
-TRADING = False
+BALANCE_MONEY = int(lines[0].replace("'",""))
+BALANCE_COIN  = int(lines[1].replace("'",""))
+TRADING = str2bool(lines[2].replace("'",""))
 TYPE = False 
 TARGET = 0
 STOP_LOSS = 0
@@ -44,7 +46,7 @@ WIN = 0
 LOSSES = 0
 OLD_PRICE = 0
 START_TIME = datetime.now()
-TYPE_OF_TRADING = "SuperTrend"
+TYPE_OF_TRADING = "Scalping"
 TIME_INTERVAL = ""
 PAIR_MOEDAS = ""
 
@@ -307,106 +309,26 @@ def output(df, TRADING, interval,going_up, BALANCE_COIN, BALANCE_MONEY):
         ]], headers="firstrow", tablefmt="fancy_grid"))  
         
     if TYPE_OF_TRADING == "Scalping":
-        if df['EMA200'].iloc[-1] > df.Close.iloc[-1]:
-            A = Fore.GREEN
-        else:
-            A = Fore.RED 
-            
-        if (df['RSI_Good'].iloc[-1] > 80):
-            B = Fore.GREEN
-        else:
-            B = Fore.RED       
-        
-        if (df['RSI_Bad'].iloc[-1] > 80):
-            C = Fore.GREEN
-        else:
-            C = Fore.RED  
-            
-        if df['RSI_Diff'].iloc[-1] < 0:
-            D = Fore.GREEN
-        else:
-            D = Fore.RED    
-            
-        if (df['ST_10_1'].iloc[-1] > df.Close.iloc[-1]):
-            E = Fore.GREEN
-        else:
-            E = Fore.RED   
-            
-        if (df['ST_11_2'].iloc[-1] > df.Close.iloc[-1]):
-            F = Fore.GREEN
-        else:
-            F = Fore.RED   
-            
-        if (df['ST_12_3'].iloc[-1] > df.Close.iloc[-1]):
-            G = Fore.GREEN
-        else:
-            G = Fore.RED    
-            
-            
-            
-        if df['EMA200'].iloc[-1] < df.Close.iloc[-1]:
-            AA = Fore.GREEN
-        else:
-            AA = Fore.RED 
-            
-        if (df['RSI_Good'].iloc[-1] < 20):
+  
+ 
+        if  df['EMA200'].iloc[-1] < df['EMA50'].iloc[-1]:
             BB = Fore.GREEN
         else:
             BB = Fore.RED       
-        
-        if (df['RSI_Bad'].iloc[-1] < 20):
+       
+            
+        if (df['MACD'].iloc[-1] < df["MACD"].iloc[-72:-1].min()):
             CC = Fore.GREEN
         else:
-            CC = Fore.RED  
+            CC = Fore.RED   
             
-        if df['RSI_Diff'].iloc[-1] > 0:
-            DD = Fore.GREEN
-        else:
-            DD = Fore.RED    
-            
-        if (df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]):
+        if df['RSI_Diff'].iloc[-1] > 0 :
             EE = Fore.GREEN
         else:
-            EE = Fore.RED   
+            EE = Fore.RED     
+
             
-        if (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]):
-            FF = Fore.GREEN
-        else:
-            FF = Fore.RED   
-            
-        if (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1]):
-            GG = Fore.GREEN
-        else:
-            GG = Fore.RED 
-            
-            
-        if (df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) or (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]) or (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1]):
-            EEE = Fore.YELLOW
-            FFF = Fore.YELLOW
-            GGG = Fore.YELLOW
-            if (df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1]):
-                EEE = Fore.GREEN
-                FFF = Fore.GREEN
-                GGG = Fore.GREEN
-        else: 
-            EEE = EE
-            FFF = FF
-            GGG = GG
-    
-        if ((df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1])) \
-        or ((df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1])) \
-        or ((df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1])):
-            EEEE = Fore.YELLOW
-            FFFF = Fore.YELLOW
-            GGGG = Fore.YELLOW
-            if (df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1]):
-                EEEE = Fore.GREEN
-                FFFF = Fore.GREEN
-                GGGG = Fore.GREEN
-        else: 
-            EEEE = EE
-            FFFF = FF
-            GGGG = GG
+
     
         
         
@@ -423,10 +345,10 @@ def output(df, TRADING, interval,going_up, BALANCE_COIN, BALANCE_MONEY):
 
         [Fore.CYAN +  "Long" + Style.RESET_ALL, \
         str(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),\
-        AA +  str(df['EMA200'].iloc[-1]) + Style.RESET_ALL, \
+        Fore.CYAN +  str(df['EMA200'].iloc[-1]) + Style.RESET_ALL, \
         BB +  str(df['EMA50'].iloc[-1]) + Style.RESET_ALL, \
         CC +  str(df['MACD'].iloc[-1]) + Style.RESET_ALL, \
-        DD +  str(df["MACD"].iloc[-72:-1].min()) + Style.RESET_ALL, \
+        Fore.CYAN +  str(df["MACD"].iloc[-72:-1].min()) + Style.RESET_ALL, \
         EE +  str(df['RSI_Diff'].iloc[-1]) + Style.RESET_ALL, \
         ]], headers="firstrow", tablefmt="fancy_grid"))  
         
@@ -484,7 +406,7 @@ def sound():
 
  
 def run(): 
-    global PAIR_MOEDAS, TIME_INTERVAL, TRADING, TARGET, TYPE, OLD_PRICE, STOP_LOSS, ORDER_TIME, BALANCE_COIN, BALANCE_MONEY, TYPE_OF_TRADING
+    global PAIR_MOEDAS, TIME_INTERVAL, TRADING, TARGET, TYPE, OLD_PRICE, STOP_LOSS, ORDER_TIME, BALANCE_COIN, BALANCE_MONEY, TYPE_OF_TRADING, WIN, LOSSES
 
     while True:
                     
@@ -577,7 +499,8 @@ def run():
                                     ["Target: " + str(TARGET)],\
                                     ["Stop-Loss: "+ str(STOP_LOSS)]])
                                 except:
-                                    pass                            
+                                    pass   
+                                TRADING = True                                    
                                 with open('BuySell.txt', 'a') as out:  
                                     pprint("Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), stream=out)
                                     pprint("#### LONG ####", stream=out)
@@ -586,7 +509,7 @@ def run():
                                 with open('currency.txt', 'w') as out:  
                                     pprint(str(BALANCE_MONEY), stream=out)
                                     pprint(str(BALANCE_COIN), stream=out)                                  
-                                TRADING = True
+                                    pprint(str(TRADING), stream=out)
                                     
                             elif (df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) \
                             and (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]) \
@@ -610,6 +533,7 @@ def run():
                                 ORDER_TIME = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))                            
                                 BALANCE_COIN = df.Close.iloc[-1]*(BALANCE_MONEY - BALANCE_MONEY*0.1/100)
                                 sound() # Beep
+                                TRADING = True
                                 try:                                
                                     telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
                                     ["Risk Level: Low"],\
@@ -625,8 +549,9 @@ def run():
                                     pprint("Stop-Loss: "+ str(STOP_LOSS), stream=out)
                                 with open('currency.txt', 'w') as out:  
                                     pprint(str(BALANCE_MONEY), stream=out)
-                                    pprint(str(BALANCE_COIN), stream=out)                                  
-                                TRADING = True
+                                    pprint(str(BALANCE_COIN), stream=out) 
+                                    pprint(str(TRADING), stream=out)                                    
+                                
             if TYPE_OF_TRADING == "Scalping":
                 if df['EMA200'].iloc[-1] < df['EMA50'].iloc[-1]:
                     if (df['MACD'].iloc[-1] < df["MACD"].iloc[-72:-1].min())\
@@ -639,12 +564,12 @@ def run():
                                 sound() # Beep
                                 try:                                
                                     telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
-                                    ["Risk Level: Medium"],\
                                     ["#### LONG ####"],\
                                     ["Target: " + str(TARGET)],\
                                     ["Stop-Loss: "+ str(STOP_LOSS)]])
                                 except:
-                                    pass                            
+                                    pass  
+                                TRADING = True
                                 with open('BuySell.txt', 'a') as out:  
                                     pprint("Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), stream=out)
                                     pprint("#### LONG ####", stream=out)
@@ -652,8 +577,9 @@ def run():
                                     pprint("Stop-Loss: "+ str(STOP_LOSS), stream=out) 
                                 with open('currency.txt', 'w') as out:  
                                     pprint(str(BALANCE_MONEY), stream=out)
-                                    pprint(str(BALANCE_COIN), stream=out)                                  
-                                TRADING = True                
+                                    pprint(str(BALANCE_COIN), stream=out) 
+                                    pprint(str(TRADING), stream=out)                                    
+                                                
                             
                         #elif (df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) \
                         #or (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]) \
@@ -702,6 +628,7 @@ def run():
                 if df.Close.iloc[-1] > STOP_LOSS:
                     BALANCE_MONEY = BALANCE_COIN*df.Close.iloc[-1]
                     BALANCE_MONEY = BALANCE_MONEY - BALANCE_MONEY*0.1/100
+                    TRADING = False
                     with open('BuySell.txt', 'a') as out:                    
                         pprint("Time: "+ str(datetime.now()), stream=out)
                         LOSSES = LOSSES + 1
@@ -711,6 +638,7 @@ def run():
                     with open('currency.txt', 'w') as out:  
                         pprint(str(BALANCE_MONEY), stream=out)
                         pprint(str(BALANCE_COIN), stream=out)
+                        pprint(str(TRADING), stream=out)
                     try:    
                        Orders_dataframe['Status'] = df['Status'].replace(['Open'],'Closed')                    
                        telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
@@ -718,10 +646,11 @@ def run():
                        ["Loss/Win Ration: "+ str(LOSSES) + "/" + str(WIN)]])
                     except:
                        pass 
-                    TRADING = False
+                    
                 elif df.Close.iloc[-1] < TARGET:
                     BALANCE_MONEY = BALANCE_COIN*df.Close.iloc[-1]
                     BALANCE_MONEY = BALANCE_MONEY - BALANCE_MONEY*0.1/100
+                    TRADING = False
                     with open('BuySell.txt', 'a') as out:  
                         pprint("Time: "+ str(datetime.now()), stream=out)
                         WIN = WIN + 1
@@ -731,6 +660,7 @@ def run():
                     with open('currency.txt', 'w') as out:  
                         pprint(str(BALANCE_MONEY), stream=out)
                         pprint(str(BALANCE_COIN), stream=out)
+                        pprint(str(TRADING), stream=out)
                     try: 
                       Orders_dataframe['Status'] = df['Status'].replace(['Open'],'Closed')                    
                       telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
@@ -739,17 +669,22 @@ def run():
                     except:
                        pass 
                        
-                    TRADING = False
+                    
             else: #long
                 if df.Close.iloc[-1] < STOP_LOSS:
                     BALANCE_MONEY = BALANCE_COIN*df.Close.iloc[-1]
                     BALANCE_MONEY = BALANCE_MONEY - BALANCE_MONEY*0.1/100
+                    TRADING = False
                     with open('BuySell.txt', 'a') as out:  
                         pprint("Time: "+ str(datetime.now()), stream=out)
                         LOSSES = LOSSES + 1
                         pprint("Lost to Stop-Loss"+ str(STOP_LOSS), stream=out)
                         pprint("Loss/Win Ration: "+ str(LOSSES) + "/" + str(WIN), stream=out)
                         pprint("Balance: "+ str(BALANCE_MONEY) + "€", stream=out)
+                    with open('currency.txt', 'w') as out:  
+                        pprint(str(BALANCE_MONEY), stream=out)
+                        pprint(str(BALANCE_COIN), stream=out)
+                        pprint(str(TRADING), stream=out)
                     try:
                        Orders_dataframe['Status'] = df['Status'].replace(['Open'],'Closed')                                        
                        telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
@@ -757,7 +692,7 @@ def run():
                        ["Loss/Win Ration: "+ str(LOSSES) + "/" + str(WIN)]])
                     except:
                        pass 
-                    TRADING = False
+                   
                     
                 elif df.Close.iloc[-1] > TARGET:
                     with open('BuySell.txt', 'a') as out:  
@@ -765,6 +700,10 @@ def run():
                         pprint("Time: "+ str(datetime.now()), stream=out)
                         pprint("Won to Target"+ str(TARGET), stream=out) 
                         pprint("Loss/Win Ration: "+ str(LOSSES) + "/" + str(WIN), stream=out)
+                    with open('currency.txt', 'w') as out:  
+                        pprint(str(BALANCE_MONEY), stream=out)
+                        pprint(str(BALANCE_COIN), stream=out)
+                        pprint(str(TRADING), stream=out)
                     try:
                        Orders_dataframe['Status'] = df['Status'].replace(['Open'],'Closed')                                        
                        telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
@@ -815,20 +754,32 @@ def return_status():
     global PAIR_MOEDAS,TIME_INTERVAL
 
     df = getminutedata(PAIR_MOEDAS, TIME_INTERVAL)
-    applytechnicals(df)    
-    return  tabulate([      ["Currently Trading->",str(PAIR_MOEDAS)],\
+    applytechnicals(df)  
+    if TYPE_OF_TRADING == "SuperTrend":
+        return  tabulate([      ["Trading Strategy->",str(TYPE_OF_TRADING)],\
+                                ["Currently Trading->",str(PAIR_MOEDAS)],\
+                                ["Current Price ->",str(df.Close.iloc[-1])+"€"],\
+                                ["Time interval ->",str(TIME_INTERVAL)], \
+                                ["EMA 200 ->",str(df['EMA200'].iloc[-1])], \
+                                ["Stoch RSI K ->",str(df['RSI_Good'].iloc[-1])], \
+                                ["Stoch RSI D ->",str(df['RSI_Bad'].iloc[-1])], \
+                                ["RSI Difference ->",str(df['RSI_Diff'].iloc[-1])], \
+                                ["SuperTrend 10-1 ->",str(df['ST_10_1'].iloc[-1])], \
+                                ["SuperTrend 11-2 ->",str(df['ST_11_2'].iloc[-1])], \
+                                ["SuperTrend 12-3 ->",str(df['ST_12_3'].iloc[-1])] \
+                                ],tablefmt='plain')
+    else:
+        return  tabulate([  ["Trading Strategy->",str(TYPE_OF_TRADING)],\
+                            ["Currently Trading->",str(PAIR_MOEDAS)],\
                             ["Current Price ->",str(df.Close.iloc[-1])+"€"],\
                             ["Time interval ->",str(TIME_INTERVAL)], \
                             ["EMA 200 ->",str(df['EMA200'].iloc[-1])], \
-                            ["Stoch RSI K ->",str(df['RSI_Good'].iloc[-1])], \
-                            ["Stoch RSI D ->",str(df['RSI_Bad'].iloc[-1])], \
-                            ["RSI Difference ->",str(df['RSI_Diff'].iloc[-1])], \
-                            ["SuperTrend 10-1 ->",str(df['ST_10_1'].iloc[-1])], \
-                            ["SuperTrend 11-2 ->",str(df['ST_11_2'].iloc[-1])], \
-                            ["SuperTrend 12-3 ->",str(df['ST_12_3'].iloc[-1])], \
+                            ["EMA 50 ->",str(df['EMA50'].iloc[-1])], \
+                            ["MACD ->",str(df['MACD'].iloc[-1])], \
+                            ["MACD Goal ->",str(df["MACD"].iloc[-72:-1].min())], \
+                            ["RSI_Diff ->",str(df['RSI_Diff'].iloc[-1])] \
                             ],tablefmt='plain')
-
-    
+                
 def uptime(update, context):
 
     time_delta = (datetime.now() - START_TIME)
