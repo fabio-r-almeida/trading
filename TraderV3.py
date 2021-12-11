@@ -200,6 +200,29 @@ def output(df, TRADING, interval,going_up):
         GG = Fore.GREEN
     else:
         GG = Fore.RED 
+        
+        
+    if (df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) or (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]) or (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1]):
+        EEE = Fore.YELLOW
+        FFF = Fore.YELLOW
+        GGG = Fore.YELLOW
+    else: 
+        EEE = EE
+        FFF = FF
+        GGG = GG
+
+    if ((df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1])) \
+    or ((df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1])) \
+    or ((df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]) and (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1])):
+        EEEE = Fore.YELLOW
+        FFFF = Fore.YELLOW
+        GGGG = Fore.YELLOW
+    else: 
+        EEEE = EE
+        FFFF = FF
+        GGGG = GG
+
+    
     
     click.clear()
     if going_up:
@@ -224,9 +247,7 @@ def output(df, TRADING, interval,going_up):
     #G +  str(df['ST_12_3'].iloc[-1]) + Style.RESET_ALL, \
     #],
     #
-    
-    
-    [Fore.CYAN +  "SPOT - Long" + Style.RESET_ALL, \
+    [Fore.CYAN +  "Safe - Long" + Style.RESET_ALL, \
     str(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),\
     AA +  str(df['EMA200'].iloc[-1]) + Style.RESET_ALL, \
     BB +  str(df['RSI_Good'].iloc[-1]) + Style.RESET_ALL, \
@@ -235,6 +256,29 @@ def output(df, TRADING, interval,going_up):
     EE +  str(df['ST_10_1'].iloc[-1]) + Style.RESET_ALL, \
     FF +  str(df['ST_11_2'].iloc[-1]) + Style.RESET_ALL, \
     GG +  str(df['ST_12_3'].iloc[-1]) + Style.RESET_ALL, \
+    ], \
+    
+    [Fore.CYAN +  "Medium - Long" + Style.RESET_ALL, \
+    str(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),\
+    AA +  str(df['EMA200'].iloc[-1]) + Style.RESET_ALL, \
+    BB +  str(df['RSI_Good'].iloc[-1]) + Style.RESET_ALL, \
+    CC +  str(df['RSI_Bad'].iloc[-1]) + Style.RESET_ALL, \
+    DD +  str(df['RSI_Diff'].iloc[-1]) + Style.RESET_ALL, \
+    EEEE +  str(df['ST_10_1'].iloc[-1]) + Style.RESET_ALL, \
+    FFFF +  str(df['ST_11_2'].iloc[-1]) + Style.RESET_ALL, \
+    GGGG +  str(df['ST_12_3'].iloc[-1]) + Style.RESET_ALL, \
+    ], \
+    
+    
+    [Fore.CYAN +  "Risky - Long" + Style.RESET_ALL, \
+    str(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),\
+    AA +  str(df['EMA200'].iloc[-1]) + Style.RESET_ALL, \
+    BB +  str(df['RSI_Good'].iloc[-1]) + Style.RESET_ALL, \
+    CC +  str(df['RSI_Bad'].iloc[-1]) + Style.RESET_ALL, \
+    DD +  str(df['RSI_Diff'].iloc[-1]) + Style.RESET_ALL, \
+    EEE +  str(df['ST_10_1'].iloc[-1]) + Style.RESET_ALL, \
+    FFF +  str(df['ST_11_2'].iloc[-1]) + Style.RESET_ALL, \
+    GGG +  str(df['ST_12_3'].iloc[-1]) + Style.RESET_ALL, \
     ]], headers="firstrow", tablefmt="fancy_grid"))  
     
     print(tabulate([\
@@ -297,7 +341,7 @@ def run():
    # winsound.Beep(1000, 100)
     time.sleep(3)
     try:                                
-       telegram_send.send(messages=[["Trading bot Started trading:\n -> Pair:" + str(pair_moedas)+ "\n -> Time Interval:" + str(time_interval)]])
+       telegram_send.send(messages=[["Trading bot Started trading:\n -> Pair:" + str(pair_moedas)],["\n -> Time Interval:" + str(time_interval)]])
     except:
         pass 
     while True:
@@ -390,6 +434,7 @@ def run():
                             sound() # Beep
                             try:                                
                                telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
+                               ["Risk Level: Medium"],\
                                ["#### LONG ####"],\
                                ["Target: " + str(TARGET)],\
                                ["Stop-Loss: "+ str(STOP_LOSS)]])
@@ -425,6 +470,7 @@ def run():
                             sound() # Beep
                             try:                                
                                telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
+                               ["Risk Level: Low"],\
                                ["#### LONG ####"],\
                                ["Target: " + str(TARGET)],\
                                ["Stop-Loss: "+ str(STOP_LOSS)]])
@@ -461,6 +507,7 @@ def run():
                             sound() # Beep
                             try:                                
                                telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
+                               ["Risk Level: Very High"],\
                                ["#### LONG ####"],\
                                ["Target: " + str(TARGET)],\
                                ["Stop-Loss: "+ str(STOP_LOSS)]])
@@ -468,7 +515,7 @@ def run():
                                pass                             
                             with open('BuySell.txt', 'a') as out:  
                                 pprint("Time: "+ str(datetime.now()), stream=out)
-                                pprint("Very Risky: #### LONG ####", stream=out)
+                                pprint("#### LONG ####", stream=out)
                                 pprint("Target: " + str(TARGET), stream=out)
                                 pprint("Stop-Loss: "+ str(STOP_LOSS), stream=out)
                             TRADING = True
@@ -623,7 +670,7 @@ def status(update, context):
 if __name__ == '__main__':
     
     pair_moedas = "DOTEUR" #input("Enter your pair: ")    
-    time_interval = "15m" #input("Enter your time interval: ")  
+    time_interval = "5m" #input("Enter your time interval: ")  
     
     TOKEN = TELE_API
     updater = Updater(token=TOKEN, use_context=True)
