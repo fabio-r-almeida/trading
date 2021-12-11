@@ -39,6 +39,7 @@ ORDER_TIME = 0
 WIN = 0
 LOSSES = 0
 OLD_PRICE = 0
+START_TIME = datetime.now()
 
 #Telegram bot variables
 Orders_dataframe = pd.DataFrame([], columns = ['Type of Order', 'Time','Stop-Loss','Target','Status'])
@@ -58,7 +59,7 @@ slope_print= 0
 bol_avg_print = 0
 rsi_diff_print = 0
 buy_price= 0
-STOP_LOSS = 0
+
 
 pair_moedas = ""
 time_interval = ""
@@ -506,6 +507,34 @@ def run():
 
 
 
+     
+
+
+def change_coin(update, context):
+    global pair_moedas
+    user_says = " ".join(context.args)
+    old_coin = pair_moedas
+    pair_moedas = str(user_says)
+    update.message.reply_text("Updating to " + user_says)
+    time.sleep(0.5)
+    update.message.reply_text("25%")
+    time.sleep(0.5)
+    update.message.reply_text("50%")
+    time.sleep(0.5)
+    update.message.reply_text("75%")
+    time.sleep(0.5)
+    update.message.reply_text("100%")
+    time.sleep(0.5)
+    df = getminutedata(pair_moedas, time_interval)
+    applytechnicals(df) 
+    
+    try:                                
+       telegram_send.send(messages=[["Coin Pair changed by user at "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))], ["Coin pair changed from " + str(old_coin) + " to " + str(pair_moedas)], ["Use /status to get the new values"]])
+    except:
+       pass 
+
+
+
 def return_orders():  
     return tabulate(Orders_dataframe, headers='keys', tablefmt='plain')
     
@@ -529,7 +558,23 @@ def return_status():
                             ],tablefmt='plain')
 
     
-            
+def uptime(update, context):
+
+    time_delta = (datetime.now() - START_TIME)
+    total_seconds = time_delta.total_seconds()
+
+    
+    if total_seconds/60 > 60:
+        time = total_seconds/3600 
+        update.message.reply_text(str(time) + " hours")
+    elif total_seconds/60 > 1:
+        time = total_seconds/60 
+        update.message.reply_text(str(time) + " minutes")
+    else:
+        time = total_seconds 
+        update.message.reply_text(str(time) + " seconds")
+        
+                
     
 def status(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=return_status())
@@ -547,7 +592,18 @@ if __name__ == '__main__':
     
     status_handler = CommandHandler("status", status)
     dispatcher.add_handler(status_handler)
+    
+    change_coin_handler = CommandHandler("change_coin", change_coin)
+    dispatcher.add_handler(change_coin_handler)
+    
+    uptime_handler = CommandHandler("uptime", uptime)
+    dispatcher.add_handler(uptime_handler)
+
 
     updater.start_polling()
+    #try:                                
+      # telegram_send.send(messages=["Trading bot Started trading " + str(pair_moedas)])
+    #except:
+    #   pass 
     
     run()
