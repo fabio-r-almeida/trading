@@ -601,9 +601,9 @@ if __name__ == '__main__':
 
 
     updater.start_polling()
-    #try:                                
-      # telegram_send.send(messages=["Trading bot Started trading " + str(pair_moedas)])
-    #except:
-    #   pass 
+    try:                                
+       telegram_send.send(messages=["Trading bot Started trading:\n -> Pair:" + str(pair_moedas)+ "\n -> Time Interval:" + str(time_interval)])
+    except:
+       pass 
     
     run()
