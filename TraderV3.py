@@ -297,7 +297,7 @@ def run():
    # winsound.Beep(1000, 100)
     time.sleep(3)
     try:                                
-       telegram_send.send(messages=["Trading bot Started trading:\n -> Pair:" + str(pair_moedas)+ "\n -> Time Interval:" + str(time_interval)])
+       telegram_send.send(messages=[["Trading bot Started trading:\n -> Pair:" + str(pair_moedas)+ "\n -> Time Interval:" + str(time_interval)]])
     except:
         pass 
     while True:
@@ -436,7 +436,42 @@ def run():
                                 pprint("Target: " + str(TARGET), stream=out)
                                 pprint("Stop-Loss: "+ str(STOP_LOSS), stream=out)
                             TRADING = True
+                            
+                            
+                        elif (df['ST_10_1'].iloc[-1] < df.Close.iloc[-1]) \
+                        or (df['ST_11_2'].iloc[-1] < df.Close.iloc[-1]) \
+                        or (df['ST_12_3'].iloc[-1] < df.Close.iloc[-1]):
                         
+                            super_trend = []
+                            super_trend.append(df['ST_10_1'].iloc[-1])
+                            super_trend.append(df['ST_11_2'].iloc[-1])
+                            super_trend.append(df['ST_12_3'].iloc[-1])
+                            super_trend.sort()
+                            
+                            
+                            STOP_LOSS = super_trend[1]
+                            Stop_Loss_min = df.Close.iloc[-1] - df.Close.iloc[-1]*0.45/100
+                            if  STOP_LOSS < Stop_Loss_min:
+                                pass
+                            else:
+                                STOP_LOSS = Stop_Loss_min
+                            TARGET = (df.Close.iloc[-1]-STOP_LOSS)/0.75 + df.Close.iloc[-1]
+                            TYPE = False
+                            ORDER_TIME = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                            sound() # Beep
+                            try:                                
+                               telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
+                               ["#### LONG ####"],\
+                               ["Target: " + str(TARGET)],\
+                               ["Stop-Loss: "+ str(STOP_LOSS)]])
+                            except:
+                               pass                             
+                            with open('BuySell.txt', 'a') as out:  
+                                pprint("Time: "+ str(datetime.now()), stream=out)
+                                pprint("Very Risky: #### LONG ####", stream=out)
+                                pprint("Target: " + str(TARGET), stream=out)
+                                pprint("Stop-Loss: "+ str(STOP_LOSS), stream=out)
+                            TRADING = True
                     
         if TRADING:
         #TYPE = True -> Short Trading
@@ -586,7 +621,7 @@ def status(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=return_status())
   
 if __name__ == '__main__':
-    global pair_moedas,time_interval
+    
     pair_moedas = "DOTEUR" #input("Enter your pair: ")    
     time_interval = "15m" #input("Enter your time interval: ")  
     
