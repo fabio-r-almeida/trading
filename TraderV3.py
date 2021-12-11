@@ -15,7 +15,7 @@ from tabulate import tabulate
 from pprint import pprint
 import os
 import requests
-import winsound
+#import winsound
 from dotenv import load_dotenv
 from datetime import datetime
 import pandas_ta 
@@ -284,7 +284,8 @@ def write_file(df):
             pprint("", stream=out)
     
 def sound():
-    winsound.Beep(1000, 1000)
+    #winsound.Beep(1000, 1000)
+    pass
  
     
 
@@ -294,7 +295,11 @@ def run():
    # winsound.Beep(1000, 100)
    # time.sleep(0.1)
    # winsound.Beep(1000, 100)
-   # time.sleep(0.1)
+    time.sleep(3)
+    try:                                
+       telegram_send.send(messages=["Trading bot Started trading:\n -> Pair:" + str(pair_moedas)+ "\n -> Time Interval:" + str(time_interval)])
+    except:
+        pass 
     while True:
         try:
             if df.Close.iloc[-1]:
@@ -476,7 +481,7 @@ def run():
                     try:
                        Orders_dataframe['Status'] = df['Status'].replace(['Open'],'Closed')                                        
                        telegram_send.send(messages=[["Time: "+ str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))],\
-                       ["Lost to Stop-Loss" + str(TARGET)],\
+                       ["Lost to Stop-Loss" + str(STOP_LOSS)],\
                        ["Loss/Win Ration: "+ str(LOSSES) + "/" + str(WIN)]])
                     except:
                        pass 
@@ -601,9 +606,5 @@ if __name__ == '__main__':
 
 
     updater.start_polling()
-    try:                                
-       telegram_send.send(messages=["Trading bot Started trading:\n -> Pair:" + str(pair_moedas)+ "\n -> Time Interval:" + str(time_interval)])
-    except:
-       pass 
-    
+   
     run()
