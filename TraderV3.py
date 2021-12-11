@@ -546,7 +546,8 @@ def return_orders():
 def orders(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=return_orders())
 
-def return_status():  
+def return_status(): 
+    global pair_moedas,time_interval
 
     df = getminutedata(pair_moedas, time_interval)
     applytechnicals(df)    
@@ -585,7 +586,8 @@ def status(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=return_status())
   
 if __name__ == '__main__':
-    pair_moedas = input("Enter your pair: ")    
+    global pair_moedas,time_interval
+    pair_moedas = "DOTEUR" #input("Enter your pair: ")    
     time_interval = "15m" #input("Enter your time interval: ")  
     
     TOKEN = TELE_API
